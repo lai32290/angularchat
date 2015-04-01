@@ -1,0 +1,70 @@
+<!doctype html>
+<html ng-app="helloChat">
+<head>
+	<title>Socket.IO chat</title>
+	<style>
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+	body { font: 13px Helvetica, Arial; }
+	form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+	form input { border: 0; padding: 10px; width: 80%; margin-right: .5%; }
+	form button, .btn { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+	
+	</style>
+	<script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+	<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<link rel="stylesheet" href="public/bootstrap/css/bootstrap.min.css">
+	<script src="public/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/js/code.js"></script>
+</head>
+
+<body ng-controller="chatCtrl">
+	<div class="row">
+		<div ng-hide="user" class="col-md-6">
+			Nome: <input type="text" id="nome" ng-model="_user">
+			<button id="setName" class="btn" ng-click="login()" ng-disabled="!_user">OK</button><br>
+		</div>
+
+		<div ng-show="user" class="col-md-6">
+			Olá <b>{{user}}</b>, seja bem vindo.
+			<button ng-click="sair()" class="btn btn-danger">Sair</button>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			Mensagens:
+			<ul ng-repeat="msg in messages">
+				<li><b>[{{msg.user}}]</b> {{msg.msg}}</li>
+			</ul>
+		</div>
+		<div class="col-md-2">
+			{{users.length}} usuários: <br>
+			<ul ng-repeat="u in users" class="list-unstyled">
+				<li>
+					{{u.name}}
+
+					<div style="display: inline-block" ng-if="isAdmin">
+						<a ng-click="kick(u)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+						<a ng-click="muteing(u)">
+							<span ng-class='{"glyphicon glyphicon-volume-off" : !u.mute, 
+								"glyphicon glyphicon-volume-up" : u.mute}'></span>
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<form action="">
+		<input id="m" autocomplete="off" ng-model="message" ng-disabled="!user || mute == true"/>
+		<button ng-click="sendmsg()" onclick="return false;" ng-disabled="!user || !message || mute">
+			<span ng-hide="mute == true">Send</span>
+			<span ng-show="mute == true" class="glyphicon glyphicon-volume-off"></span>
+		</button>
+		<button ng-click="limpar()" onclick="return false;">Limpar Chat</button>
+	</form>
+</body>
+</html>
